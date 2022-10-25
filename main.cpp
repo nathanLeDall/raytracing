@@ -82,22 +82,8 @@ int main() {
     std::cout << "P3\n" << image_width << ' ' << image_height << "\n255\n";
 
     auto start = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
-
-    /*for (int j = image_height-1; j >= 0; --j) {
-        std::cerr << "\rscans remaining: "<< j << ' ' << std::flush;
-        for (int i = 0; i < image_width; ++i) {
-            color pixelColour(0,0,0);
-            for (int k = 0; k<samplesPerPixel; k++)
-            {
-                double u = double(i+randomDouble())/ (image_width-1);
-                double v = double(j+randomDouble())/ (image_height-1);
-                ray r = cam.get_ray(u,v);
-                pixelColour += rayColor(r,world,maxDepth);
-            }
-            writeColour(std::cout, pixelColour, samplesPerPixel);
-        }
-    }*/
-
+    
+    //buffers
     auto* f1 = new std::vector<color*>{};
     auto* f2 = new std::vector<color*>{};
     auto* f3 = new std::vector<color*>{};
@@ -109,6 +95,8 @@ int main() {
     auto* f9 = new std::vector<color*>{};
     auto* f10 = new std::vector<color*>{};
 
+    //threads
+
     std::thread t1(trace,f1, 225, cam, world, image_width, 205, maxDepth, samplesPerPixel,image_height);
     std::thread t2(trace,f2, 205, cam, world, image_width, 195, maxDepth, samplesPerPixel,image_height);
     std::thread t3(trace,f3, 195, cam, world, image_width, 160, maxDepth, samplesPerPixel,image_height);
@@ -119,6 +107,8 @@ int main() {
     std::thread t8(trace,f8, 85, cam, world, image_width, 65, maxDepth, samplesPerPixel,image_height);
     std::thread t9(trace,f9, 65, cam, world, image_width, 45, maxDepth, samplesPerPixel,image_height);
     std::thread t10(trace,f10, 45, cam, world, image_width, 0, maxDepth, samplesPerPixel,image_height);
+
+    //waiting each thread
 
     if(t1.joinable())
     {
@@ -161,6 +151,8 @@ int main() {
         t10.join();
     }
 
+    //outputing each buffer
+    
     for (auto i: *f1)
     {
         std::cout << static_cast<int>(i->x()) << ' ' << static_cast<int>(i->y()) << ' ' << static_cast<int>(i->z()) << '\n';
